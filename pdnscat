@@ -1,4 +1,9 @@
 #!/bin/bash
+################################################
+#	PDNSCAT - PowerDNS search client	#	
+#	By Sparco of Hackernet.se		#
+#################################################
+
 
 # PowerDNS server where API is activated.
 PDNSSERVER="10.240.100.125";
@@ -7,13 +12,15 @@ PDNSSERVER="10.240.100.125";
 APIPORT="8081";
 
 #API Key
-APIKEY="neger123";
+APIKEY="APIKEY123";
 
 # What records to filter on. Example A|AAAA|CNAME
 RECORDS="A|CNAME";
 
+#				#
+# Dont touch below this line.	#
+#				#
 
-# Dont touch below this line.
 loginAdmin=0
 loginRoot=0
 loginMyself=0
