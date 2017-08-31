@@ -1,0 +1,109 @@
+#!/bin/bash
+
+# PowerDNS server where API is activated.
+PDNSSERVER="10.240.100.125";
+
+#API port
+APIPORT="8081";
+
+#API Key
+APIKEY="neger123";
+
+# What records to filter on. Example A|AAAA|CNAME
+RECORDS="A|CNAME";
+
+
+# Dont touch below this line.
+loginAdmin=0
+loginRoot=0
+loginMyself=0
+fqdn=0
+output=""
+declare -a args=()
+
+# just syntax
+Usage()
+{
+   echo
+   echo "Usage: pdnscat arg1 arg2 arg3 ... [f] [a|r|q|l] ..."
+   echo
+   echo "f - show FQDN"
+   echo
+   echo "SSH towards the host using following user." 
+   echo "a - admin"
+   echo "r - root"
+   echo "q - $USER"
+   echo 
+   echo
+   exit
+}
+
+# step through the input argument list, and build a new argument list while removing login commands
+while (( "$#" )); do
+ case "$1" in
+   f)
+      fqdn=1 ;;
+   a)
+      loginAdmin=1 ;;
+   r)
+      loginRoot=1 ;;
+   q)
+      loginMyself=1 ;;
+   *)
+      args[${#args[*]}]="$1" ;;
+  esac
+  shift
+done
+
+# get what domains to search the DNS for.
+ZONES=`cat /etc/resolv.conf | grep search | awk '{$1= ""; print $0}'`;
+
+# if we're down to zero filters after pulling the login and fqdn arguments, just show the usage
+if [ ${#args[*]} == "0" ]; then Usage ; fi
+
+# Curl PowerDNS API and filter the JSON output. 
+output=$(for i in $ZONES; 
+do 
+	curl -s -H "X-API-Key: $APIKEY" http://"$PDNSSERVER":"$APIPORT"/api/v1/servers/localhost/zones/"$i" | \
+	jq '.rrsets[] | .name + " " + .type + " " + (.records[] | .content)' | \
+	awk -v OFS='\t' '{print $3, $2, $1}' | awk '$2 ~ /^('$RECORDS')/' | \
+	tr -d '"' | sort -k 3 
+	
+done)
+
+# if we just want the hostname, filter out the FQDN
+if [ $fqdn == "0" ]; then
+	  output=$(echo "$output" | cut -d. -f1-4)
+fi
+
+# filter on each argument, we have already pulled the specific login and fqdn arguments from this list
+for i in "${args[@]}"
+do
+
+#  echo "filtering on: \"$i\""
+  output=$(echo "$output" | grep -i $i)
+done
+
+# if we want to login to a machine, we need first to determine if we're down to one machine
+numLines=$(echo "$output" | wc -l)
+numLogin=$((loginAdmin + loginRoot + loginMyself ))
+if [ $numLines -eq 1 ] && [ $numLogin -ne 0 ] ; then
+
+  if [ $numLogin -ne 1 ]; then echo "More than one login account requested, prio order: admin, root, `whoami`" ; fi
+  if [ $loginMyself -eq 1 ]; then login="`whoami`" ; fi
+  if [ $loginRoot -eq 1 ]; then login="root" ; fi
+  if [ $loginAdmin -eq 1 ]; then login="admin" ; fi
+
+  hostIP=$(echo $output | awk '{print $1}')
+  hostname=$(echo $output | awk '{print $3}')
+  echo
+  echo "--- IP and hostname ---"
+  echo "$hostIP"
+  echo "$hostname"
+  echo "ssh $login@$hostIP"
+  echo
+  ssh $login@$hostname
+  exit
+fi
+
+echo "$output"
