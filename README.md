@@ -1,5 +1,5 @@
 # PDNSCAT - PowerDNS search client.
-pdnscat is a bash script that curls the PowerDNS API after all domains in resolv.conf file.
+pdnscat is a bash script that curls the PowerDNS API after all search domains in /etc/resolv.conf file.
 
 After you have filtred down to 1 line you can SSH to that device using predifined usernames like root, admin the user you are.
 
