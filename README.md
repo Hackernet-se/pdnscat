@@ -7,7 +7,7 @@ After you have filtred down to 1 line you can SSH to that device using predifine
 Script need __curl__ and __JQ__ to work.
 ```
 git clone https://github.com/Hackernet-se/pdnscat
-./pdnscat arg1 arg2 arg3 ... [f] [a|r|q|l] ...
+./pdnscat arg1 arg2 arg3 ... [f] [a|r|q] ...
 ```
 ### Examples
 ##### Grep on all nameservers.
