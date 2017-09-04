@@ -12,7 +12,7 @@ git clone https://github.com/Hackernet-se/pdnscat
 ### Examples
 ##### Grep on all nameservers.
 ```bash
-sparco@jumpgate:~$ y ns    
+sparco@jumpgate:~$ ./pdnscat ns    
 10.240.100.12   A       ns3
 172.22.0.12     A       ns4
 10.240.100.13   A       ns5
@@ -20,7 +20,7 @@ sparco@jumpgate:~$ y ns
 ```
 ##### SSH to ns5
 ```bash
-sparco@jumpgate:~$ y ns 5   
+sparco@jumpgate:~$ ./pdnscat ns 5   
 10.240.100.13   A       ns5
 sparco@jumpgate:~$ y ns 5 r                                      
                                                                  
@@ -34,7 +34,7 @@ Welcome to Ubuntu 16.04.2 LTS (GNU/Linux 4.4.0-79-generic x86_64)
 ```
 ##### Grep on everything from a subdomain.
 ```bash
-sparco@jumpgate:~$ y rsg f
+sparco@jumpgate:~$ ./pdnscat rsg f
 10.60.0.50      A       rsg-proxy.hackernet.se.
 10.60.0.4       A       esxispa1-ilo.rsg.hackernet.se.
 10.60.0.5       A       esxispa2-ilo.rsg.hackernet.se.
